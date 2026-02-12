@@ -34,6 +34,7 @@ final class NotchContentView: NSView {
 
     // ── Top bar (always visible) ───────────────────────────────
     private var dotView: NSView!
+    private var dotIsActive = false
     private var timerDisplay: NSTextField!
 
     // ── Expanded-only content ──────────────────────────────────
@@ -101,8 +102,8 @@ final class NotchContentView: NSView {
         dotView.layer?.cornerRadius = 5  // 10x10 dot, so radius = 5
         addSubview(dotView)
 
-        timerDisplay = makeLabel("25:00", size: 13, weight: .medium)
-        timerDisplay.font = .monospacedDigitSystemFont(ofSize: 13, weight: .medium)
+        timerDisplay = makeLabel("25:00", size: 11, weight: .medium)
+        timerDisplay.font = .monospacedDigitSystemFont(ofSize: 11, weight: .medium)
         addSubview(timerDisplay)
     }
 
@@ -181,7 +182,7 @@ final class NotchContentView: NSView {
 
         let w = bounds.width
         let barH: CGFloat = Constants.collapsedHeight
-        let pad: CGFloat = 20
+        let pad: CGFloat = 26
 
         // ── Top bar ──
         let dotSize: CGFloat = 10
@@ -189,15 +190,15 @@ final class NotchContentView: NSView {
         dotView.layer?.cornerRadius = dotSize / 2
         
         timerDisplay.sizeToFit()
-        timerDisplay.frame.origin = CGPoint(x: w - timerDisplay.frame.width - 14,  // moved slightly right
+        timerDisplay.frame.origin = CGPoint(x: w - timerDisplay.frame.width - 20,
                                             y: (barH - timerDisplay.frame.height) / 2)
 
         // ── Expanded panel ──
-        let panelX: CGFloat = 12
-        let panelY: CGFloat = barH + 6
+        let panelX: CGFloat = 20
+        let panelY: CGFloat = barH + 22
         
-        // Gear icon positioned at top-right of expanded area (not in top bar)
-        gearIcon.frame = NSRect(x: w - 30, y: panelY - 20, width: 16, height: 16)
+        // Gear icon positioned at top-right of expanded area
+        gearIcon.frame = NSRect(x: w - 34, y: panelY - 18, width: 16, height: 16)
         let panelW = w - panelX * 2
         expandedPanel.frame = NSRect(x: panelX, y: panelY,
                                      width: panelW,
@@ -254,72 +255,70 @@ final class NotchContentView: NSView {
 
     // MARK: - Bezel shape path
 
-    /// Morphs from notch-like top profile to flat-top bezel with rounded bottom corners.
+    /// Creates the notch shape with ear curves (like the JS reference).
+    /// Shape: curved ears at top corners, flat top between them, rounded bottom corners.
+    ///
+    /// Based on JS SVG paths:
+    /// - Left ear:  M24 0 L24 24 Q24 0 0 0 Z
+    /// - Right ear: M0 0 L0 24 Q0 0 24 0 Z
     private func bezelPath(in rect: CGRect, morph: CGFloat) -> CGPath {
-        let progress = min(max(morph, 0), 1)
-        let radius = min(Constants.bottomRadius, rect.height / 2, rect.width / 2)
-
-        // 0.0: macOS-notch-like top (narrow + shoulders), 1.0: full-width flat top.
-        let startInset = min(Constants.topInset, max(rect.width / 2 - 1, 0))
-        let startShoulderDepth = min(Constants.curveHeight, max(rect.height - radius - 1, 0))
-        let topInset = lerp(startInset, 0, progress)
-        let shoulderDepth = lerp(startShoulderDepth, 0, progress)
-
-        let minX = rect.minX
-        let maxX = rect.maxX
-        // Layer-backed NSView uses flipped geometry here (y-down), so top is minY.
-        let topY = rect.minY
-        let bottomY = rect.maxY
-
-        let leftTopX = minX + topInset
-        let rightTopX = maxX - topInset
-        let shoulderY = topY + shoulderDepth
-
+        _ = morph  // unused for now, but kept for animation compatibility
+        let w = rect.width
+        let h = rect.height
+        
+        // Ear size and bottom radius (matches JS: L=12 collapsed, L=24 expanded)
+        let earSize: CGFloat = 12
+        let bottomRadius: CGFloat = min(12, h / 2, w / 4)
+        
+        // Safety: if too small, just return a rounded rect
+        guard w > earSize * 2 + 4, h > earSize + bottomRadius else {
+            return CGPath(roundedRect: rect, cornerWidth: min(h/2, 12), cornerHeight: min(h/2, 12), transform: nil)
+        }
+        
         let path = CGMutablePath()
-        path.move(to: CGPoint(x: leftTopX, y: topY))
-        path.addLine(to: CGPoint(x: rightTopX, y: topY))
-
-        if shoulderDepth > 0.5 {
-            path.addCurve(
-                to: CGPoint(x: maxX, y: shoulderY),
-                control1: CGPoint(x: rightTopX + topInset * 0.58, y: topY),
-                control2: CGPoint(x: maxX, y: topY + shoulderDepth * 0.35)
-            )
-        } else {
-            path.addLine(to: CGPoint(x: maxX, y: topY))
-        }
-
-        path.addLine(to: CGPoint(x: maxX, y: bottomY - radius))
+        
+        // Start at outer top-left corner (0, 0)
+        path.move(to: CGPoint(x: 0, y: 0))
+        
+        // Left ear curve: from (0,0) curving down to (earSize, earSize)
+        // Matches JS: Q24,0 → control at top-right of ear
         path.addQuadCurve(
-            to: CGPoint(x: maxX - radius, y: bottomY),
-            control: CGPoint(x: maxX, y: bottomY)
+            to: CGPoint(x: earSize, y: earSize),
+            control: CGPoint(x: earSize, y: 0)
         )
-
-        path.addLine(to: CGPoint(x: minX + radius, y: bottomY))
+        
+        // Left side going down
+        path.addLine(to: CGPoint(x: earSize, y: h - bottomRadius))
+        
+        // Bottom-left corner
         path.addQuadCurve(
-            to: CGPoint(x: minX, y: bottomY - radius),
-            control: CGPoint(x: minX, y: bottomY)
+            to: CGPoint(x: earSize + bottomRadius, y: h),
+            control: CGPoint(x: earSize, y: h)
         )
-
-        path.addLine(to: CGPoint(x: minX, y: shoulderY))
-
-        if shoulderDepth > 0.5 {
-            path.addCurve(
-                to: CGPoint(x: leftTopX, y: topY),
-                control1: CGPoint(x: minX, y: topY + shoulderDepth * 0.35),
-                control2: CGPoint(x: leftTopX - topInset * 0.58, y: topY)
-            )
-        } else {
-            path.addLine(to: CGPoint(x: minX, y: topY))
-            path.addLine(to: CGPoint(x: leftTopX, y: topY))
-        }
-
+        
+        // Bottom edge
+        path.addLine(to: CGPoint(x: w - earSize - bottomRadius, y: h))
+        
+        // Bottom-right corner
+        path.addQuadCurve(
+            to: CGPoint(x: w - earSize, y: h - bottomRadius),
+            control: CGPoint(x: w - earSize, y: h)
+        )
+        
+        // Right side going up
+        path.addLine(to: CGPoint(x: w - earSize, y: earSize))
+        
+        // Right ear curve: from (w-earSize, earSize) curving up to (w, 0)
+        // Matches JS: Q0,0 → control at top-left of ear
+        path.addQuadCurve(
+            to: CGPoint(x: w, y: 0),
+            control: CGPoint(x: w - earSize, y: 0)
+        )
+        
+        // Close path (flat top edge from (w,0) back to (0,0))
         path.closeSubpath()
+        
         return path
-    }
-
-    private func lerp(_ start: CGFloat, _ end: CGFloat, _ progress: CGFloat) -> CGFloat {
-        start + (end - start) * progress
     }
 
     // MARK: - Hit testing & interaction
@@ -327,9 +326,9 @@ final class NotchContentView: NSView {
     override func mouseDown(with event: NSEvent) {
         let loc = convert(event.locationInWindow, from: nil)
 
-        // Dot pop animation
+        // Dot toggle color
         if dotView.frame.insetBy(dx: -5, dy: -5).contains(loc) {
-            popDot()
+            toggleDot()
             return
         }
 
@@ -344,36 +343,18 @@ final class NotchContentView: NSView {
         super.mouseDown(with: event)
     }
     
-    private func popDot() {
-        guard let layer = dotView.layer else { return }
+    private func toggleDot() {
+        dotIsActive.toggle()
         
-        // Pop animation: scale up and fade out, then reset
-        let scaleAnim = CAKeyframeAnimation(keyPath: "transform.scale")
-        scaleAnim.values = [1.0, 2.0, 2.5]
-        scaleAnim.keyTimes = [0, 0.4, 1.0]
-        scaleAnim.duration = 0.3
+        let newColor: NSColor = dotIsActive 
+            ? NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)  // light scarlet/red
+            : .white
         
-        let fadeAnim = CAKeyframeAnimation(keyPath: "opacity")
-        fadeAnim.values = [1.0, 0.8, 0.0]
-        fadeAnim.keyTimes = [0, 0.4, 1.0]
-        fadeAnim.duration = 0.3
-        
-        let group = CAAnimationGroup()
-        group.animations = [scaleAnim, fadeAnim]
-        group.duration = 0.3
-        
-        CATransaction.begin()
-        CATransaction.setCompletionBlock { [weak self] in
-            // Reset after pop
-            layer.opacity = 1.0
-            layer.transform = CATransform3DIdentity
+        // Animate the color change
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.2
+            dotView.layer?.backgroundColor = newColor.cgColor
         }
-        
-        layer.add(group, forKey: "pop")
-        layer.opacity = 0
-        layer.transform = CATransform3DMakeScale(2.5, 2.5, 1)
-        
-        CATransaction.commit()
     }
 
     private func updatePlayIcon() {

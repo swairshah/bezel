@@ -1,0 +1,61 @@
+Here's the JavaScript (React/Framer Motion) code that controls the notch shape. It's in a minified Next.js chunk, but the logic is clear:
+The Notch Shape Code
+Key Variables
+jslet L = h ? 24 : 12;   // Corner curve size (24px expanded, 12px collapsed)
+let F = h ? 32 : 12;   // Bottom border radius (32px expanded, 12px collapsed)
+let B = h ? 360 : 220; // Total notch width (360px expanded, 220px collapsed)
+h is a boolean state that tracks whether the notch is expanded (hovered), and N is the setter function. N is defined as:
+jslet N = t => {
+  o(t);    // sets "i" state (some boolean)
+  d(t);    // sets "h" (the expanded boolean)
+  if (!t) {
+    v(false);  // close focus pal gallery
+    w(false);  // close music selector
+    C(false);  // close timer dropdown
+  }
+};
+Static Fallback (before JS hydration)
+If the component hasn't mounted yet (!M), a simple static black pill is rendered:
+html<div class="w-[220px] h-[28px] bg-black rounded-[12px]"></div>
+The Animated Notch (3 pieces)
+1. Left corner curve — an SVG with a quadratic bezier that creates the smooth curve blending from the menu bar into the notch:
+jsx<motion.div
+  className="absolute top-0"
+  animate={{ width: L, height: L, x: -(B/2 + L - 0.5) }}
+  style={{ left: "50%" }}
+  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+>
+  <svg viewBox="0 0 24 24" preserveAspectRatio="none">
+    <path d="M24 0 L24 24 Q24 0 0 0 Z" fill="black" />
+  </svg>
+</motion.div>
+2. Right corner curve — mirror image:
+jsx<motion.div
+  className="absolute top-0"
+  animate={{ width: L, height: L, x: B/2 - 0.5 }}
+  style={{ left: "50%" }}
+  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+>
+  <svg viewBox="0 0 24 24" preserveAspectRatio="none">
+    <path d="M0 0 L0 24 Q0 0 24 0 Z" fill="black" />
+  </svg>
+</motion.div>
+3. Main notch body — a black rounded rectangle that animates between collapsed and expanded:
+jsx<motion.div
+  className={`relative bg-black ${h ? "overflow-visible" : "overflow-hidden"}`}
+  animate={{
+    width: h ? 360 : 220,
+    height: h ? 185 : 28,
+    borderBottomLeftRadius: F,
+    borderBottomRightRadius: F
+  }}
+  style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+  whileHover={h ? {} : { scale: 1.03 }}
+>
+  {/* AnimatePresence swaps between expanded/collapsed content */}
+</motion.div>
+How the Shape Works
+The notch shape is composed of three parts positioned side-by-side at the top of the hero image. The two SVG corner pieces use quadratic Bézier curves (Q command in the path) to create the smooth "ear" transitions — the left one draws M24 0 L24 24 Q24 0 0 0 Z (a curve from the bottom-right to top-left) and the right mirrors it. These sit flush against the edges of the main black rectangle, which has border-radius: 0 on top and 12px (or 32px when expanded) on the bottom.
+Everything is wrapped in a parent div with class absolute left-1/2 -translate-x-1/2 top-0 z-20 to center it at the top of the screen preview.
+On hover, all three pieces spring-animate together (using Framer Motion's spring physics with stiffness: 400, damping: 35) — the corners grow from 12px to 24px, the body expands from 220×28 to 360×185, and the bottom corners become more rounded (12px → 32px).

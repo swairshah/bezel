@@ -1,11 +1,11 @@
 import AppKit
 
 enum Constants {
-    // Bezel dimensions — same width for smooth vertical-only animation
+    // Bezel dimensions — expands both horizontally and vertically
     static let collapsedWidth: CGFloat = 300
     static let collapsedHeight: CGFloat = 36
-    static let expandedWidth: CGFloat = 300
-    static let expandedHeight: CGFloat = 200
+    static let expandedWidth: CGFloat = 360
+    static let expandedHeight: CGFloat = 180
 
     // Animation
     static let openDuration: TimeInterval = 0.9     // initial open from notch
