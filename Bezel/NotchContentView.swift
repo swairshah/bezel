@@ -100,7 +100,7 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         // Clickable dot
         dotView = NSView()
         dotView.wantsLayer = true
-        dotView.layer?.backgroundColor = NSColor.white.cgColor
+        dotView.layer?.backgroundColor = NSColor(white: 0.5, alpha: 1.0).cgColor  // dimmer gray
         dotView.layer?.cornerRadius = 5  // 10x10 dot, so radius = 5
         addSubview(dotView)
 
@@ -405,8 +405,8 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         dotIsActive.toggle()
         
         let newColor: NSColor = dotIsActive 
-            ? NSColor(red: 1.0, green: 0.4, blue: 0.4, alpha: 1.0)  // light scarlet/red
-            : .white
+            ? NSColor(red: 0.91, green: 0.45, blue: 0.32, alpha: 1.0)  // burnt sienna
+            : NSColor(white: 0.5, alpha: 1.0)  // dimmer gray
         
         // Animate the color change
         NSAnimationContext.runAnimationGroup { ctx in
