@@ -288,9 +288,9 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         let w = rect.width
         let h = rect.height
         
-        // Ear size and bottom radius (matches JS: L=12 collapsed, L=24 expanded)
-        let earSize: CGFloat = 12
-        let bottomRadius: CGFloat = min(12, h / 2, w / 4)
+        // Ear size and bottom radius
+        let earSize: CGFloat = 16
+        let bottomRadius: CGFloat = min(18, h / 2, w / 4)
         
         // Safety: if too small, just return a rounded rect
         guard w > earSize * 2 + 4, h > earSize + bottomRadius else {

@@ -55,7 +55,8 @@ final class AnimationController {
 
         NSAnimationContext.runAnimationGroup({ ctx in
             ctx.duration = Constants.expandDuration
-            ctx.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 1, 0.3, 1)
+            ctx.timingFunction = CAMediaTimingFunction(controlPoints: 0.0, 0.0, 0.2, 1.0)  // fast start, smooth end
+            ctx.allowsImplicitAnimation = true
             window.animator().setFrame(target, display: true)
         }, completionHandler: { [weak self] in
             self?.isAnimating = false
@@ -72,7 +73,8 @@ final class AnimationController {
 
         NSAnimationContext.runAnimationGroup({ ctx in
             ctx.duration = Constants.collapseDuration
-            ctx.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 1, 0.3, 1)
+            ctx.timingFunction = CAMediaTimingFunction(controlPoints: 0.0, 0.0, 0.2, 1.0)  // fast start, smooth end
+            ctx.allowsImplicitAnimation = true
             window.animator().setFrame(target, display: true)
         }, completionHandler: { [weak self] in
             self?.isAnimating = false
