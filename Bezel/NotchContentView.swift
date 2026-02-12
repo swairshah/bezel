@@ -216,7 +216,7 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
                                             y: (barH - timerDisplay.frame.height) / 2)
 
         // ── Expanded panel ──
-        let panelX: CGFloat = 20
+        let panelX: CGFloat = 28
         let panelY: CGFloat = barH + 18
         
         // Gear icon positioned to the right of the timer (in the expanded space)
@@ -288,9 +288,9 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         let w = rect.width
         let h = rect.height
         
-        // Ear size and bottom radius
+        // Ear size (fixed for consistent look) and bottom corner radius
         let earSize: CGFloat = 16
-        let bottomRadius: CGFloat = min(18, h / 2, w / 4)
+        let bottomRadius: CGFloat = min(22, h / 2, w / 4)  // more rounded corners
         
         // Safety: if too small, just return a rounded rect
         guard w > earSize * 2 + 4, h > earSize + bottomRadius else {
