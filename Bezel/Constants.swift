@@ -8,9 +8,9 @@ enum Constants {
     static let expandedHeight: CGFloat = 200
 
     // Animation
-    static let openDuration: TimeInterval = 0.5      // initial open from notch
-    static let expandDuration: TimeInterval = 0.35
-    static let collapseDuration: TimeInterval = 0.3
+    static let openDuration: TimeInterval = 0.9     // initial open from notch
+    static let expandDuration: TimeInterval = 0.5
+    static let collapseDuration: TimeInterval = 0.2
 
     // Hover detection
     static let hoverPadding: CGFloat = 30

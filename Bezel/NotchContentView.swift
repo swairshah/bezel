@@ -33,7 +33,7 @@ final class NotchContentView: NSView {
     }
 
     // ── Top bar (always visible) ───────────────────────────────
-    private var catEmoji: NSTextField!
+    private var dotView: NSView!
     private var timerDisplay: NSTextField!
 
     // ── Expanded-only content ──────────────────────────────────
@@ -94,8 +94,12 @@ final class NotchContentView: NSView {
     // MARK: Top bar
 
     private func buildTopBar() {
-        catEmoji = makeLabel("🐈", size: 13)
-        addSubview(catEmoji)
+        // Clickable dot
+        dotView = NSView()
+        dotView.wantsLayer = true
+        dotView.layer?.backgroundColor = NSColor.white.cgColor
+        dotView.layer?.cornerRadius = 5  // 10x10 dot, so radius = 5
+        addSubview(dotView)
 
         timerDisplay = makeLabel("25:00", size: 13, weight: .medium)
         timerDisplay.font = .monospacedDigitSystemFont(ofSize: 13, weight: .medium)
@@ -180,10 +184,12 @@ final class NotchContentView: NSView {
         let pad: CGFloat = 20
 
         // ── Top bar ──
-        catEmoji.sizeToFit()
+        let dotSize: CGFloat = 10
+        dotView.frame = NSRect(x: pad, y: (barH - dotSize) / 2, width: dotSize, height: dotSize)
+        dotView.layer?.cornerRadius = dotSize / 2
+        
         timerDisplay.sizeToFit()
-        catEmoji.frame.origin     = CGPoint(x: pad, y: (barH - catEmoji.frame.height) / 2)
-        timerDisplay.frame.origin = CGPoint(x: w - timerDisplay.frame.width - pad,
+        timerDisplay.frame.origin = CGPoint(x: w - timerDisplay.frame.width - 14,  // moved slightly right
                                             y: (barH - timerDisplay.frame.height) / 2)
 
         // ── Expanded panel ──
@@ -321,6 +327,12 @@ final class NotchContentView: NSView {
     override func mouseDown(with event: NSEvent) {
         let loc = convert(event.locationInWindow, from: nil)
 
+        // Dot pop animation
+        if dotView.frame.insetBy(dx: -5, dy: -5).contains(loc) {
+            popDot()
+            return
+        }
+
         // Play / pause chip
         let playInWindow = playChip.convert(playChip.bounds, to: self)
         if playInWindow.contains(loc) {
@@ -330,6 +342,38 @@ final class NotchContentView: NSView {
         }
 
         super.mouseDown(with: event)
+    }
+    
+    private func popDot() {
+        guard let layer = dotView.layer else { return }
+        
+        // Pop animation: scale up and fade out, then reset
+        let scaleAnim = CAKeyframeAnimation(keyPath: "transform.scale")
+        scaleAnim.values = [1.0, 2.0, 2.5]
+        scaleAnim.keyTimes = [0, 0.4, 1.0]
+        scaleAnim.duration = 0.3
+        
+        let fadeAnim = CAKeyframeAnimation(keyPath: "opacity")
+        fadeAnim.values = [1.0, 0.8, 0.0]
+        fadeAnim.keyTimes = [0, 0.4, 1.0]
+        fadeAnim.duration = 0.3
+        
+        let group = CAAnimationGroup()
+        group.animations = [scaleAnim, fadeAnim]
+        group.duration = 0.3
+        
+        CATransaction.begin()
+        CATransaction.setCompletionBlock { [weak self] in
+            // Reset after pop
+            layer.opacity = 1.0
+            layer.transform = CATransform3DIdentity
+        }
+        
+        layer.add(group, forKey: "pop")
+        layer.opacity = 0
+        layer.transform = CATransform3DMakeScale(2.5, 2.5, 1)
+        
+        CATransaction.commit()
     }
 
     private func updatePlayIcon() {
