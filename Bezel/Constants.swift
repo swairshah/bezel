@@ -9,12 +9,12 @@ enum Constants {
 
     // Animation
     static let openDuration: TimeInterval = 0.9     // initial open from notch
-    static let expandDuration: TimeInterval = 0.5
+    static let expandDuration: TimeInterval = 0.3
     static let collapseDuration: TimeInterval = 0.2
 
     // Hover detection
     static let hoverPadding: CGFloat = 30
-    static let debounceInterval: TimeInterval = 0.1
+    static let debounceInterval: TimeInterval = 0.02
 
     // Bezel shape
     static let topInset: CGFloat = 32      // narrowing at each side of the top edge
