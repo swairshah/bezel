@@ -1,6 +1,6 @@
 # Bezel
 
-An experimental Notch app for Mac.
+A notch app for Mac.
 
 ![macOS](https://img.shields.io/badge/macOS-12.0+-black)
 
@@ -8,9 +8,10 @@ An experimental Notch app for Mac.
 
 Bezel is a simple notch-area utility for MacBooks with a notch. It sits in your menu bar notch and provides quick access to a pomodoro timer.
 
-**Inspired by:**
+Inspired by : 
 - [Alcove](https://tryalcove.com/faqs)
 - [Oak](https://www.oakfocus.co/)
+(please buy those beautiful apps. These are by excellent designers and they maintain and expand their software!)
 
 ## Development
 
