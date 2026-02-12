@@ -10,7 +10,7 @@ private class FlippedView: NSView {
 
 // MARK: - NotchContentView
 
-final class NotchContentView: NSView {
+final class NotchContentView: NSView, NSTextFieldDelegate {
 
     override var isFlipped: Bool { true }
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
@@ -36,6 +36,8 @@ final class NotchContentView: NSView {
     private var dotView: NSView!
     private var dotIsActive = false
     private var timerDisplay: NSTextField!
+    private var timerHovered = false
+    private var timerTrackingArea: NSTrackingArea?
 
     // ── Expanded-only content ──────────────────────────────────
     private var gearIcon: NSImageView!
@@ -125,7 +127,6 @@ final class NotchContentView: NSView {
         addSubview(expandedPanel)
 
         buildTimerRow()
-        buildFeatureCards()
     }
 
     private func buildTimerRow() {
@@ -137,7 +138,23 @@ final class NotchContentView: NSView {
         durationChip.addSubview(durationLabel)
         timerRow.addSubview(durationChip)
 
-        taskLabel = makeLabel("Task (optional)", size: 13, color: Constants.dimText)
+        taskLabel = NSTextField()
+        taskLabel.placeholderAttributedString = NSAttributedString(
+            string: "Task (optional)",
+            attributes: [
+                .foregroundColor: NSColor(white: 0.45, alpha: 1),
+                .font: NSFont.systemFont(ofSize: 13)
+            ]
+        )
+        taskLabel.font = .systemFont(ofSize: 13)
+        taskLabel.textColor = .white
+        taskLabel.backgroundColor = .clear
+        taskLabel.isBezeled = false
+        taskLabel.focusRingType = .none
+        taskLabel.isEditable = false  // disabled by default
+        taskLabel.isSelectable = false
+        taskLabel.drawsBackground = false
+        taskLabel.delegate = self
         timerRow.addSubview(taskLabel)
 
         playChip = roundedBox(Constants.chipColor, radius: Constants.chipRadius)
@@ -183,29 +200,33 @@ final class NotchContentView: NSView {
         let w = bounds.width
         let barH: CGFloat = Constants.collapsedHeight
         let pad: CGFloat = 26
+        
+        // Calculate offset to keep dot/timer in same absolute screen position
+        // when bezel expands horizontally
+        let widthDiff = w - Constants.collapsedWidth
+        let edgeOffset = widthDiff / 2
 
         // ── Top bar ──
         let dotSize: CGFloat = 10
-        dotView.frame = NSRect(x: pad, y: (barH - dotSize) / 2, width: dotSize, height: dotSize)
+        dotView.frame = NSRect(x: pad + edgeOffset, y: (barH - dotSize) / 2, width: dotSize, height: dotSize)
         dotView.layer?.cornerRadius = dotSize / 2
         
         timerDisplay.sizeToFit()
-        timerDisplay.frame.origin = CGPoint(x: w - timerDisplay.frame.width - 20,
+        timerDisplay.frame.origin = CGPoint(x: w - timerDisplay.frame.width - 20 - edgeOffset,
                                             y: (barH - timerDisplay.frame.height) / 2)
 
         // ── Expanded panel ──
         let panelX: CGFloat = 20
-        let panelY: CGFloat = barH + 22
+        let panelY: CGFloat = barH + 18
         
-        // Gear icon positioned at top-right of expanded area
-        gearIcon.frame = NSRect(x: w - 34, y: panelY - 18, width: 16, height: 16)
+        // Gear icon positioned to the right of the timer (in the expanded space)
+        gearIcon.frame = NSRect(x: w - 20 - edgeOffset + 8, y: (barH - 16) / 2, width: 16, height: 16)
         let panelW = w - panelX * 2
         expandedPanel.frame = NSRect(x: panelX, y: panelY,
                                      width: panelW,
-                                     height: bounds.height - panelY - 20)
+                                     height: bounds.height - panelY - 12)
 
         layoutTimerRow(panelW)
-        layoutFeatureCards(panelW)
     }
 
     private func layoutTimerRow(_ pw: CGFloat) {
@@ -220,8 +241,9 @@ final class NotchContentView: NSView {
         durationChip.frame = NSRect(x: inset, y: (rowH - chipH) / 2, width: dw, height: chipH)
         durationLabel.frame.origin = CGPoint(x: 11, y: (chipH - durationLabel.frame.height) / 2)
 
-        taskLabel.sizeToFit()
-        taskLabel.frame.origin = CGPoint(x: inset + dw + 10, y: (rowH - taskLabel.frame.height) / 2)
+        let taskX = inset + dw + 10
+        let taskW = pw - taskX - inset - 32 - 10  // leave room for play button
+        taskLabel.frame = NSRect(x: taskX, y: (rowH - 20) / 2, width: taskW, height: 20)
 
         let playS: CGFloat = 32
         playChip.frame = NSRect(x: pw - inset - playS, y: (rowH - playS) / 2, width: playS, height: playS)
@@ -331,6 +353,27 @@ final class NotchContentView: NSView {
             toggleDot()
             return
         }
+        
+        // Timer click - toggle play/pause
+        if timerDisplay.frame.insetBy(dx: -5, dy: -5).contains(loc) {
+            pomodoroTimer.toggle()
+            updateTimerDisplay()
+            return
+        }
+
+        // Task label - enable editing when clicked
+        let taskInWindow = taskLabel.convert(taskLabel.bounds, to: self)
+        if taskInWindow.contains(loc) {
+            taskLabel.isEditable = true
+            taskLabel.isSelectable = true
+            window?.makeFirstResponder(taskLabel)
+            return
+        }
+        
+        // Click outside task label - end editing
+        if taskLabel.isEditable {
+            endTaskEditing()
+        }
 
         // Play / pause chip
         let playInWindow = playChip.convert(playChip.bounds, to: self)
@@ -341,6 +384,21 @@ final class NotchContentView: NSView {
         }
 
         super.mouseDown(with: event)
+    }
+    
+    private func endTaskEditing() {
+        taskLabel.isEditable = false
+        taskLabel.isSelectable = false
+        window?.makeFirstResponder(nil)
+    }
+    
+    // NSTextFieldDelegate - handle Enter key
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        if commandSelector == #selector(insertNewline(_:)) {
+            endTaskEditing()
+            return true
+        }
+        return false
     }
     
     private func toggleDot() {
@@ -355,6 +413,71 @@ final class NotchContentView: NSView {
             ctx.duration = 0.2
             dotView.layer?.backgroundColor = newColor.cgColor
         }
+    }
+    
+    // MARK: - Hover zone detection
+    
+    /// Returns true if the given point (in screen coordinates) is over edge zones
+    /// (left side including dot, right side including timer)
+    func isOverEdgeElements(screenPoint: NSPoint) -> Bool {
+        guard let window = window else { return false }
+        let windowPoint = window.convertPoint(fromScreen: screenPoint)
+        let viewPoint = convert(windowPoint, from: nil)
+        
+        // Left edge zone: from left edge to right side of dot + padding
+        let leftZone = NSRect(x: 0, y: 0, width: dotView.frame.maxX + 15, height: bounds.height)
+        
+        // Right edge zone: from left side of timer - padding to right edge
+        let rightZone = NSRect(x: timerDisplay.frame.minX - 15, y: 0, 
+                               width: bounds.width - timerDisplay.frame.minX + 15, height: bounds.height)
+        
+        return leftZone.contains(viewPoint) || rightZone.contains(viewPoint)
+    }
+    
+    // MARK: - Timer hover tracking
+    
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        
+        if let existing = timerTrackingArea {
+            removeTrackingArea(existing)
+        }
+        
+        let timerArea = timerDisplay.frame.insetBy(dx: -5, dy: -5)
+        timerTrackingArea = NSTrackingArea(
+            rect: timerArea,
+            options: [.mouseEnteredAndExited, .activeAlways],
+            owner: self,
+            userInfo: ["element": "timer"]
+        )
+        addTrackingArea(timerTrackingArea!)
+    }
+    
+    override func mouseEntered(with event: NSEvent) {
+        guard let info = event.trackingArea?.userInfo as? [String: String],
+              info["element"] == "timer" else { return }
+        timerHovered = true
+        updateTimerDisplay()
+    }
+    
+    override func mouseExited(with event: NSEvent) {
+        guard let info = event.trackingArea?.userInfo as? [String: String],
+              info["element"] == "timer" else { return }
+        timerHovered = false
+        updateTimerDisplay()
+    }
+    
+    private func updateTimerDisplay() {
+        if timerHovered {
+            // Show play/pause icon
+            let symbol = pomodoroTimer.state == .running ? "⏸" : "▶"
+            timerDisplay.stringValue = symbol
+        } else {
+            // Show time
+            timerDisplay.stringValue = pomodoroTimer.displayString
+        }
+        timerDisplay.sizeToFit()
+        needsLayout = true
     }
 
     private func updatePlayIcon() {
@@ -385,10 +508,8 @@ final class NotchContentView: NSView {
     // MARK: - Timer
 
     private func refreshTimerLabel() {
-        timerDisplay.stringValue = pomodoroTimer.displayString
-        timerDisplay.sizeToFit()
+        updateTimerDisplay()
         updatePlayIcon()
-        needsLayout = true
     }
 
     // MARK: - Helpers

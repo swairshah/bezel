@@ -110,9 +110,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let reference = animationController.isExpanded
             ? animationController.expandedFrame()
             : animationController.collapsedFrame()
-        let zone = reference.insetBy(dx: -Constants.hoverPadding,
-                                     dy: -Constants.hoverPadding)
-        let near = zone.contains(mouse)
+        let fullZone = reference.insetBy(dx: -Constants.hoverPadding,
+                                         dy: -Constants.hoverPadding)
+        let nearFullZone = fullZone.contains(mouse)
+        
+        // Middle zone: exclude left and right edge areas (where dot and timer are)
+        let edgeWidth: CGFloat = 60  // width of edge zones to exclude
+        let middleZone = NSRect(
+            x: reference.minX + edgeWidth - Constants.hoverPadding,
+            y: reference.minY - Constants.hoverPadding,
+            width: reference.width - edgeWidth * 2 + Constants.hoverPadding * 2,
+            height: reference.height + Constants.hoverPadding * 2
+        )
+        let inMiddleZone = middleZone.contains(mouse)
 
         debounceTimer?.invalidate()
         debounceTimer = Timer.scheduledTimer(
@@ -120,18 +130,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             repeats: false
         ) { [weak self] _ in
             guard let self else { return }
-            near ? self.expandNotch() : self.collapseNotch()
+            if inMiddleZone {
+                // Only expand when in the middle zone
+                self.expandNotch()
+            } else if !nearFullZone {
+                // Collapse when completely outside
+                self.collapseNotch()
+            }
+            // If in edge zones (near but not middle), stay in current state
         }
     }
 
     private func expandNotch() {
-        notchWindow.ignoresMouseEvents = false
         contentView.showContent()
         animationController.expand()
     }
 
     private func collapseNotch() {
-        notchWindow.ignoresMouseEvents = true
         contentView.hideContent()
         animationController.collapse()
     }

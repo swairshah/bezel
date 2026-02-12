@@ -14,7 +14,7 @@ final class NotchWindow: NSPanel {
         backgroundColor = .clear
         isOpaque = false
         hasShadow = false
-        ignoresMouseEvents = true
+        ignoresMouseEvents = false
         isMovableByWindowBackground = false
         collectionBehavior = [
             .canJoinAllSpaces,

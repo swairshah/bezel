@@ -5,7 +5,7 @@ enum Constants {
     static let collapsedWidth: CGFloat = 300
     static let collapsedHeight: CGFloat = 36
     static let expandedWidth: CGFloat = 360
-    static let expandedHeight: CGFloat = 180
+    static let expandedHeight: CGFloat = 120
 
     // Animation
     static let openDuration: TimeInterval = 0.9     // initial open from notch
