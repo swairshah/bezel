@@ -19,6 +19,18 @@ final class NotchContentView: NSView {
 
     /// Shape mask that clips to the bezel silhouette.
     private let shapeMask = CAShapeLayer()
+    private var internalShapeMorphProgress: CGFloat = 1
+
+    /// 0 = native notch-like profile, 1 = custom Bezel silhouette.
+    @objc dynamic var shapeMorphProgress: CGFloat {
+        get { internalShapeMorphProgress }
+        set {
+            let clamped = min(max(newValue, 0), 1)
+            guard clamped != internalShapeMorphProgress else { return }
+            internalShapeMorphProgress = clamped
+            needsLayout = true
+        }
+    }
 
     // ── Top bar (always visible) ───────────────────────────────
     private var catEmoji: NSTextField!
@@ -53,6 +65,13 @@ final class NotchContentView: NSView {
     }
 
     required init?(coder: NSCoder) { fatalError() }
+
+    override class func defaultAnimation(forKey key: NSAnimatablePropertyKey) -> Any? {
+        if key == "shapeMorphProgress" {
+            return CABasicAnimation()
+        }
+        return super.defaultAnimation(forKey: key)
+    }
 
     // MARK: - Build UI
 
@@ -154,7 +173,7 @@ final class NotchContentView: NSView {
 
         // Update the bezel shape mask (drawn in layer coords: y-up)
         shapeMask.frame = layer!.bounds
-        shapeMask.path = bezelPath(in: layer!.bounds)
+        shapeMask.path = bezelPath(in: layer!.bounds, morph: shapeMorphProgress)
 
         let w = bounds.width
         let barH: CGFloat = Constants.collapsedHeight
@@ -229,10 +248,72 @@ final class NotchContentView: NSView {
 
     // MARK: - Bezel shape path
 
-    /// Simple rounded rectangle with fixed corner radius
-    private func bezelPath(in rect: CGRect) -> CGPath {
-        let radius: CGFloat = 14  // fixed radius for consistent shape
-        return CGPath(roundedRect: rect, cornerWidth: radius, cornerHeight: radius, transform: nil)
+    /// Morphs from notch-like top profile to flat-top bezel with rounded bottom corners.
+    private func bezelPath(in rect: CGRect, morph: CGFloat) -> CGPath {
+        let progress = min(max(morph, 0), 1)
+        let radius = min(Constants.bottomRadius, rect.height / 2, rect.width / 2)
+
+        // 0.0: macOS-notch-like top (narrow + shoulders), 1.0: full-width flat top.
+        let startInset = min(Constants.topInset, max(rect.width / 2 - 1, 0))
+        let startShoulderDepth = min(Constants.curveHeight, max(rect.height - radius - 1, 0))
+        let topInset = lerp(startInset, 0, progress)
+        let shoulderDepth = lerp(startShoulderDepth, 0, progress)
+
+        let minX = rect.minX
+        let maxX = rect.maxX
+        // Layer-backed NSView uses flipped geometry here (y-down), so top is minY.
+        let topY = rect.minY
+        let bottomY = rect.maxY
+
+        let leftTopX = minX + topInset
+        let rightTopX = maxX - topInset
+        let shoulderY = topY + shoulderDepth
+
+        let path = CGMutablePath()
+        path.move(to: CGPoint(x: leftTopX, y: topY))
+        path.addLine(to: CGPoint(x: rightTopX, y: topY))
+
+        if shoulderDepth > 0.5 {
+            path.addCurve(
+                to: CGPoint(x: maxX, y: shoulderY),
+                control1: CGPoint(x: rightTopX + topInset * 0.58, y: topY),
+                control2: CGPoint(x: maxX, y: topY + shoulderDepth * 0.35)
+            )
+        } else {
+            path.addLine(to: CGPoint(x: maxX, y: topY))
+        }
+
+        path.addLine(to: CGPoint(x: maxX, y: bottomY - radius))
+        path.addQuadCurve(
+            to: CGPoint(x: maxX - radius, y: bottomY),
+            control: CGPoint(x: maxX, y: bottomY)
+        )
+
+        path.addLine(to: CGPoint(x: minX + radius, y: bottomY))
+        path.addQuadCurve(
+            to: CGPoint(x: minX, y: bottomY - radius),
+            control: CGPoint(x: minX, y: bottomY)
+        )
+
+        path.addLine(to: CGPoint(x: minX, y: shoulderY))
+
+        if shoulderDepth > 0.5 {
+            path.addCurve(
+                to: CGPoint(x: leftTopX, y: topY),
+                control1: CGPoint(x: minX, y: topY + shoulderDepth * 0.35),
+                control2: CGPoint(x: leftTopX - topInset * 0.58, y: topY)
+            )
+        } else {
+            path.addLine(to: CGPoint(x: minX, y: topY))
+            path.addLine(to: CGPoint(x: leftTopX, y: topY))
+        }
+
+        path.closeSubpath()
+        return path
+    }
+
+    private func lerp(_ start: CGFloat, _ end: CGFloat, _ progress: CGFloat) -> CGFloat {
+        start + (end - start) * progress
     }
 
     // MARK: - Hit testing & interaction

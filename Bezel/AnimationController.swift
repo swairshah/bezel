@@ -3,13 +3,15 @@ import AppKit
 final class AnimationController {
 
     private let window: NotchWindow
+    private weak var contentView: NotchContentView?
     private(set) var notchInfo: NotchInfo
     private(set) var isExpanded = false
     private var isAnimating = false
 
-    init(window: NotchWindow, notchInfo: NotchInfo) {
+    init(window: NotchWindow, notchInfo: NotchInfo, contentView: NotchContentView? = nil) {
         self.window = window
         self.notchInfo = notchInfo
+        self.contentView = contentView
     }
 
     // MARK: - Public
@@ -22,18 +24,25 @@ final class AnimationController {
     func animateOpen(completion: (() -> Void)? = nil) {
         let start = notchFrame()
         let target = collapsedFrame()
-        
+
+        // Start with a native-notch profile, then morph into the custom shape.
+        contentView?.shapeMorphProgress = 0
+
         // Start at notch size
         window.setFrame(start, display: false)
         window.orderFront(nil)
-        
-        // Small delay before expanding for visual effect
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+
+        // Small delay keeps launch transition readable while still feeling immediate.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
             NSAnimationContext.runAnimationGroup({ ctx in
                 ctx.duration = Constants.openDuration
                 ctx.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 1, 0.3, 1) // spring-like
                 self?.window.animator().setFrame(target, display: true)
-            }, completionHandler: completion)
+                self?.contentView?.animator().shapeMorphProgress = 1
+            }, completionHandler: { [weak self] in
+                self?.contentView?.shapeMorphProgress = 1
+                completion?()
+            })
         }
     }
 

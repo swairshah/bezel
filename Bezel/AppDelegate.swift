@@ -73,7 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         notchWindow = NotchWindow(contentRect: .zero)
         contentView = NotchContentView()
-        animationController = AnimationController(window: notchWindow, notchInfo: info)
+        animationController = AnimationController(window: notchWindow, notchInfo: info, contentView: contentView)
 
         // Start with notch frame (will animate to collapsed)
         let notchFrame = animationController.notchFrame()
