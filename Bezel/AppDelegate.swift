@@ -9,7 +9,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var globalMonitor: Any?
     private var localMonitor: Any?
     private var debounceTimer: Timer?
+    private var dwellTimer: Timer?
     private var isEnabled = true
+    private var isInExpandZone = false
 
     // MARK: - Lifecycle
 
@@ -123,21 +125,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             height: reference.height + Constants.hoverPadding * 2
         )
         let inMiddleZone = middleZone.contains(mouse)
+        
+        // Only expand when cursor touches the top 5% of the bezel
+        let collapsedFrame = animationController.collapsedFrame()
+        let topThreshold = collapsedFrame.maxY - (collapsedFrame.height * 0.05)
+        let nearTop = mouse.y >= topThreshold
 
+        let shouldExpand = inMiddleZone && nearTop
+        
         debounceTimer?.invalidate()
         debounceTimer = Timer.scheduledTimer(
             withTimeInterval: Constants.debounceInterval,
             repeats: false
         ) { [weak self] _ in
             guard let self else { return }
-            if inMiddleZone {
-                // Only expand when in the middle zone
-                self.expandNotch()
-            } else if !nearFullZone {
+            
+            if shouldExpand && !self.isInExpandZone {
+                // Just entered the expand zone - start dwell timer
+                self.isInExpandZone = true
+                self.dwellTimer?.invalidate()
+                self.dwellTimer = Timer.scheduledTimer(
+                    withTimeInterval: 0.5,  // half second dwell time
+                    repeats: false
+                ) { [weak self] _ in
+                    guard let self, self.isInExpandZone else { return }
+                    self.expandNotch()
+                }
+            } else if !shouldExpand && self.isInExpandZone {
+                // Left the expand zone - cancel dwell timer
+                self.isInExpandZone = false
+                self.dwellTimer?.invalidate()
+            }
+            
+            if !nearFullZone {
                 // Collapse when completely outside
+                self.isInExpandZone = false
+                self.dwellTimer?.invalidate()
                 self.collapseNotch()
             }
-            // If in edge zones (near but not middle), stay in current state
         }
     }
 
