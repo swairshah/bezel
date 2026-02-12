@@ -1,0 +1,25 @@
+name: Bezel
+options:
+  bundleIdPrefix: com.swair
+  deploymentTarget:
+    macOS: "12.0"
+  xcodeVersion: "16.0"
+  minimumXcodeGenVersion: "2.0"
+
+targets:
+  Bezel:
+    type: application
+    platform: macOS
+    sources:
+      - Bezel
+    settings:
+      base:
+        INFOPLIST_FILE: Bezel/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.swair.bezel
+        PRODUCT_NAME: Bezel
+        SWIFT_VERSION: "5"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        COMBINE_HIDPI_IMAGES: true
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        MACOSX_DEPLOYMENT_TARGET: "12.0"

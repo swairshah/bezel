@@ -1,0 +1,336 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0D3A051F818186AB0099D309 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E092045B262D2DDDBBC532 /* Constants.swift */; };
+		10240ACA53E65CA6F3D8DD57 /* NotchWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF51A75BFA1B2555E266FF1 /* NotchWindow.swift */; };
+		30707442BED213639EADAD9C /* PomodoroTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 778B23D2BB213F6284F776F1 /* PomodoroTimer.swift */; };
+		501395AFC0E81E70227D8A42 /* NotchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC5DB8BA4FB9F847F2DDE8D0 /* NotchContentView.swift */; };
+		5AE1FE4DE42E0CF06AC115B8 /* AnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABF48338A5123AB36F8E296 /* AnimationController.swift */; };
+		633332BA9307A853A3118DA4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A067FDBC7AE7E4EFDDC8EB /* AppDelegate.swift */; };
+		70C950AE095F9FC0CB7E2AA4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D2A38115FE99E79592243F5 /* Assets.xcassets */; };
+		D54BB856AFB45E33B21ECDEB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1139C10E3C39411B8132370 /* main.swift */; };
+		E9077ACA60640FD4DA6BFF1E /* NotchDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49530C1C31FA0553D319501F /* NotchDetector.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		01A067FDBC7AE7E4EFDDC8EB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1701A7DC3CB0C2760DDCBA26 /* Bezel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bezel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1ABF48338A5123AB36F8E296 /* AnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationController.swift; sourceTree = "<group>"; };
+		3D2A38115FE99E79592243F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		49530C1C31FA0553D319501F /* NotchDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchDetector.swift; sourceTree = "<group>"; };
+		778B23D2BB213F6284F776F1 /* PomodoroTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PomodoroTimer.swift; sourceTree = "<group>"; };
+		90E092045B262D2DDDBBC532 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		990FD01A8B675C231A1A94EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		DEF51A75BFA1B2555E266FF1 /* NotchWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchWindow.swift; sourceTree = "<group>"; };
+		EC5DB8BA4FB9F847F2DDE8D0 /* NotchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchContentView.swift; sourceTree = "<group>"; };
+		F1139C10E3C39411B8132370 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2BE44A365838D5C987AFEC74 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1701A7DC3CB0C2760DDCBA26 /* Bezel.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A6239D73F868B74F72BFA591 /* Bezel */ = {
+			isa = PBXGroup;
+			children = (
+				1ABF48338A5123AB36F8E296 /* AnimationController.swift */,
+				01A067FDBC7AE7E4EFDDC8EB /* AppDelegate.swift */,
+				3D2A38115FE99E79592243F5 /* Assets.xcassets */,
+				90E092045B262D2DDDBBC532 /* Constants.swift */,
+				990FD01A8B675C231A1A94EA /* Info.plist */,
+				F1139C10E3C39411B8132370 /* main.swift */,
+				EC5DB8BA4FB9F847F2DDE8D0 /* NotchContentView.swift */,
+				49530C1C31FA0553D319501F /* NotchDetector.swift */,
+				DEF51A75BFA1B2555E266FF1 /* NotchWindow.swift */,
+				778B23D2BB213F6284F776F1 /* PomodoroTimer.swift */,
+			);
+			path = Bezel;
+			sourceTree = "<group>";
+		};
+		E3E429C443152AA6C832AE51 = {
+			isa = PBXGroup;
+			children = (
+				A6239D73F868B74F72BFA591 /* Bezel */,
+				2BE44A365838D5C987AFEC74 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C374EBE1F8498E6D91EB2724 /* Bezel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 517DE4B1072C34E783E6162A /* Build configuration list for PBXNativeTarget "Bezel" */;
+			buildPhases = (
+				D03BD5BBCFB50F75201F0677 /* Sources */,
+				B69D767526EBA453E12DC0E9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Bezel;
+			packageProductDependencies = (
+			);
+			productName = Bezel;
+			productReference = 1701A7DC3CB0C2760DDCBA26 /* Bezel.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1EC771D63073D2C268C4D0D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					C374EBE1F8498E6D91EB2724 = {
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 60C76210AF6E1E42F1014CB5 /* Build configuration list for PBXProject "Bezel" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E3E429C443152AA6C832AE51;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C374EBE1F8498E6D91EB2724 /* Bezel */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B69D767526EBA453E12DC0E9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70C950AE095F9FC0CB7E2AA4 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D03BD5BBCFB50F75201F0677 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AE1FE4DE42E0CF06AC115B8 /* AnimationController.swift in Sources */,
+				633332BA9307A853A3118DA4 /* AppDelegate.swift in Sources */,
+				0D3A051F818186AB0099D309 /* Constants.swift in Sources */,
+				501395AFC0E81E70227D8A42 /* NotchContentView.swift in Sources */,
+				E9077ACA60640FD4DA6BFF1E /* NotchDetector.swift in Sources */,
+				10240ACA53E65CA6F3D8DD57 /* NotchWindow.swift in Sources */,
+				30707442BED213639EADAD9C /* PomodoroTimer.swift in Sources */,
+				D54BB856AFB45E33B21ECDEB /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D6D205931F6350B659BA8E95 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		DA6A151F8DCBA7A7401A06EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Bezel/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.swair.bezel;
+				PRODUCT_NAME = Bezel;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5;
+			};
+			name = Debug;
+		};
+		E23321BD838A870A5688F931 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Bezel/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.swair.bezel;
+				PRODUCT_NAME = Bezel;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5;
+			};
+			name = Release;
+		};
+		F1ACCCCB5ACE6FD0AB9F74A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		517DE4B1072C34E783E6162A /* Build configuration list for PBXNativeTarget "Bezel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA6A151F8DCBA7A7401A06EC /* Debug */,
+				E23321BD838A870A5688F931 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		60C76210AF6E1E42F1014CB5 /* Build configuration list for PBXProject "Bezel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1ACCCCB5ACE6FD0AB9F74A8 /* Debug */,
+				D6D205931F6350B659BA8E95 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1EC771D63073D2C268C4D0D /* Project object */;
+}
