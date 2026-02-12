@@ -229,9 +229,9 @@ final class NotchContentView: NSView {
 
     // MARK: - Bezel shape path
 
-    /// Simple pill/tube shape - rounded rectangle
+    /// Simple rounded rectangle with fixed corner radius
     private func bezelPath(in rect: CGRect) -> CGPath {
-        let radius = rect.height / 2  // fully rounded ends (pill shape)
+        let radius: CGFloat = 14  // fixed radius for consistent shape
         return CGPath(roundedRect: rect, cornerWidth: radius, cornerHeight: radius, transform: nil)
     }
 
