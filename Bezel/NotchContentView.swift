@@ -50,6 +50,13 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
     private var taskLabel: NSTextField!
     private var playChip: NSView!
     private var playIcon: NSImageView!
+    private var stopChip: NSView!
+    private var stopIcon: NSImageView!
+    
+    // Duration picker
+    private var durationPicker: NSView?
+    private let durationOptions = [5, 15, 30]
+    private var durationButtons: [NSView: Int] = [:]
 
     // Feature cards
     private var focusPalCard: NSView!
@@ -166,6 +173,17 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         }
         playChip.addSubview(playIcon)
         timerRow.addSubview(playChip)
+        
+        stopChip = roundedBox(Constants.chipColor, radius: Constants.chipRadius)
+        if let img = sfImage("stop.fill", size: 12, weight: .medium) {
+            stopIcon = NSImageView(image: img)
+            stopIcon.contentTintColor = .white
+        } else {
+            stopIcon = NSImageView()
+        }
+        stopChip.addSubview(stopIcon)
+        stopChip.isHidden = true  // hidden by default
+        timerRow.addSubview(stopChip)
     }
 
     private func buildFeatureCards() {
@@ -235,19 +253,43 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
 
         let inset: CGFloat = 6
         let chipH: CGFloat = 32
+        let btnS: CGFloat = 32
+        let btnGap: CGFloat = 6
+        
+        let isRunningOrPaused = pomodoroTimer.state != .idle
+        
+        // Update duration chip content based on state
+        if isRunningOrPaused {
+            durationLabel.stringValue = pomodoroTimer.displayString
+        } else {
+            durationLabel.stringValue = pomodoroTimer.durationString
+        }
 
         durationLabel.sizeToFit()
         let dw = durationLabel.frame.width + 22
         durationChip.frame = NSRect(x: inset, y: (rowH - chipH) / 2, width: dw, height: chipH)
         durationLabel.frame.origin = CGPoint(x: 11, y: (chipH - durationLabel.frame.height) / 2)
 
+        // Show/hide stop button based on state
+        stopChip.isHidden = !isRunningOrPaused
+        
+        // Calculate button positions
+        let buttonsWidth = isRunningOrPaused ? (btnS * 2 + btnGap) : btnS
         let taskX = inset + dw + 10
-        let taskW = pw - taskX - inset - 32 - 10  // leave room for play button
+        let taskW = pw - taskX - inset - buttonsWidth - 10
         taskLabel.frame = NSRect(x: taskX, y: (rowH - 20) / 2, width: taskW, height: 20)
 
-        let playS: CGFloat = 32
-        playChip.frame = NSRect(x: pw - inset - playS, y: (rowH - playS) / 2, width: playS, height: playS)
-        playIcon.frame = NSRect(x: (playS - 14) / 2, y: (playS - 14) / 2, width: 14, height: 14)
+        if isRunningOrPaused {
+            // Show both pause/play and stop buttons
+            playChip.frame = NSRect(x: pw - inset - btnS * 2 - btnGap, y: (rowH - btnS) / 2, width: btnS, height: btnS)
+            stopChip.frame = NSRect(x: pw - inset - btnS, y: (rowH - btnS) / 2, width: btnS, height: btnS)
+        } else {
+            // Just play button
+            playChip.frame = NSRect(x: pw - inset - btnS, y: (rowH - btnS) / 2, width: btnS, height: btnS)
+        }
+        
+        playIcon.frame = NSRect(x: (btnS - 14) / 2, y: (btnS - 14) / 2, width: 14, height: 14)
+        stopIcon.frame = NSRect(x: (btnS - 14) / 2, y: (btnS - 14) / 2, width: 14, height: 14)
     }
 
     private func layoutFeatureCards(_ pw: CGFloat) {
@@ -348,6 +390,17 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
     override func mouseDown(with event: NSEvent) {
         let loc = convert(event.locationInWindow, from: nil)
 
+        // Duration picker - handle selection FIRST (highest priority)
+        if let picker = durationPicker {
+            let pickerFrame = picker.convert(picker.bounds, to: self)
+            if pickerFrame.contains(loc) {
+                handleDurationSelection(at: loc)
+                return
+            } else {
+                closeDurationPicker()
+            }
+        }
+
         // Dot toggle color
         if dotView.frame.insetBy(dx: -5, dy: -5).contains(loc) {
             toggleDot()
@@ -358,6 +411,13 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         if timerDisplay.frame.insetBy(dx: -5, dy: -5).contains(loc) {
             pomodoroTimer.toggle()
             updateTimerDisplay()
+            return
+        }
+        
+        // Duration chip - show picker (only when idle)
+        let durationInWindow = durationChip.convert(durationChip.bounds, to: self)
+        if durationInWindow.contains(loc) && pomodoroTimer.state == .idle {
+            toggleDurationPicker()
             return
         }
 
@@ -380,10 +440,97 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         if playInWindow.contains(loc) {
             pomodoroTimer.toggle()
             updatePlayIcon()
+            needsLayout = true
+            return
+        }
+        
+        // Stop chip
+        let stopInWindow = stopChip.convert(stopChip.bounds, to: self)
+        if stopInWindow.contains(loc) && !stopChip.isHidden {
+            pomodoroTimer.stop()
+            updatePlayIcon()
+            needsLayout = true
             return
         }
 
         super.mouseDown(with: event)
+    }
+    
+    // MARK: - Duration Picker
+    
+    private func toggleDurationPicker() {
+        if durationPicker != nil {
+            closeDurationPicker()
+        } else {
+            showDurationPicker()
+        }
+    }
+    
+    private func showDurationPicker() {
+        durationButtons.removeAll()
+        
+        let picker = FlippedView()
+        picker.wantsLayer = true
+        picker.layer?.backgroundColor = Constants.sectionColor.cgColor
+        picker.layer?.cornerRadius = 8
+        
+        let btnSize: CGFloat = 36
+        let gap: CGFloat = 4
+        let padding: CGFloat = 4
+        let pickerW = CGFloat(durationOptions.count) * btnSize + CGFloat(durationOptions.count - 1) * gap + padding * 2
+        let pickerH = btnSize + padding * 2
+        
+        // Position to the right of the duration chip
+        let chipFrame = durationChip.convert(durationChip.bounds, to: self)
+        picker.frame = NSRect(x: chipFrame.maxX + 6, y: chipFrame.midY - pickerH / 2, width: pickerW, height: pickerH)
+        
+        for (index, minutes) in durationOptions.enumerated() {
+            let btn = NSView()
+            btn.wantsLayer = true
+            btn.layer?.backgroundColor = (minutes == pomodoroTimer.durationMinutes) 
+                ? Constants.chipColor.cgColor 
+                : NSColor.clear.cgColor
+            btn.layer?.cornerRadius = 6
+            btn.layer?.borderWidth = (minutes == pomodoroTimer.durationMinutes) ? 0 : 1
+            btn.layer?.borderColor = NSColor(white: 0.3, alpha: 1).cgColor
+            
+            let x = padding + CGFloat(index) * (btnSize + gap)
+            btn.frame = NSRect(x: x, y: padding, width: btnSize, height: btnSize)
+            
+            durationButtons[btn] = minutes
+            
+            let label = makeLabel("\(minutes)", size: 12, weight: .medium)
+            label.sizeToFit()
+            label.frame.origin = CGPoint(
+                x: (btnSize - label.frame.width) / 2,
+                y: (btnSize - label.frame.height) / 2
+            )
+            btn.addSubview(label)
+            
+            picker.addSubview(btn)
+        }
+        
+        addSubview(picker)
+        durationPicker = picker
+    }
+    
+    private func closeDurationPicker() {
+        durationPicker?.removeFromSuperview()
+        durationPicker = nil
+    }
+    
+    private func handleDurationSelection(at point: NSPoint) {
+        guard let picker = durationPicker else { return }
+        let pickerPoint = convert(point, to: picker)
+        
+        for (btn, minutes) in durationButtons {
+            if btn.frame.contains(pickerPoint) {
+                pomodoroTimer.setDuration(minutes: minutes)
+                closeDurationPicker()
+                needsLayout = true
+                return
+            }
+        }
     }
     
     private func endTaskEditing() {

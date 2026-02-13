@@ -6,6 +6,7 @@ final class PomodoroTimer {
 
     private(set) var state: State = .idle
     private(set) var remainingSeconds: Int
+    private(set) var durationMinutes: Int = 25
     private var timer: Timer?
 
     var onChange: (() -> Void)?
@@ -15,9 +16,22 @@ final class PomodoroTimer {
         let s = remainingSeconds % 60
         return String(format: "%d:%02d", m, s)
     }
+    
+    var durationString: String {
+        return "\(durationMinutes) min"
+    }
 
     init(minutes: Int = 25) {
+        durationMinutes = minutes
         remainingSeconds = minutes * 60
+    }
+    
+    func setDuration(minutes: Int) {
+        durationMinutes = minutes
+        if state == .idle {
+            remainingSeconds = minutes * 60
+        }
+        onChange?()
     }
 
     func toggle() {
@@ -35,7 +49,7 @@ final class PomodoroTimer {
                 self.remainingSeconds -= 1
                 self.onChange?()
             } else {
-                self.reset()
+                self.stop()
             }
         }
         onChange?()
@@ -48,11 +62,11 @@ final class PomodoroTimer {
         onChange?()
     }
 
-    func reset() {
+    func stop() {
         state = .idle
         timer?.invalidate()
         timer = nil
-        remainingSeconds = 25 * 60
+        remainingSeconds = durationMinutes * 60
         onChange?()
     }
 
