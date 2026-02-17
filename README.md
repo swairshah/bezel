@@ -13,6 +13,7 @@ Bezel is a simple notch-area utility for MacBooks with a notch. It sits in your 
 Inspired by : 
 - [Alcove](https://tryalcove.com/faqs)
 - [Oak](https://www.oakfocus.co/)
+
 (please buy those beautiful apps. These are by excellent designers and they maintain and expand their software!)
 
 ## Development

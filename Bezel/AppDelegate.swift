@@ -39,7 +39,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
         if let button = statusItem.button {
-            if let img = NSImage(systemSymbolName: "sparkle", accessibilityDescription: "Bezel") {
+            if let img = NSImage(named: "MenubarIcon") {
+                img.isTemplate = true
+                button.image = img
+            } else if let img = NSImage(systemSymbolName: "sparkle", accessibilityDescription: "Bezel") {
                 button.image = img
             } else {
                 button.title = "\u{25C6}"
