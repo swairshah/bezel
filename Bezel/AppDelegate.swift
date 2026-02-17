@@ -87,6 +87,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         contentView.frame = notchWindow.contentView!.bounds
         contentView.autoresizingMask = [.width, .height]
         notchWindow.contentView?.addSubview(contentView)
+        contentView.applyDisplayProfile(hasNotch: info.hasNotch)
 
         // Smooth open animation from notch to collapsed state
         animationController.animateOpen()
@@ -184,6 +185,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func screenDidChange() {
         let info = NotchDetector.detect()
         animationController.updateNotchInfo(info)
+        contentView.applyDisplayProfile(hasNotch: info.hasNotch)
         notchWindow.setFrame(animationController.collapsedFrame(), display: true)
     }
 }

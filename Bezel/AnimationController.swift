@@ -98,7 +98,7 @@ final class AnimationController {
 
     func collapsedFrame() -> NSRect {
         let w = Constants.collapsedWidth
-        let h = Constants.collapsedHeight
+        let h = Constants.collapsedHeight(hasNotch: notchInfo.hasNotch)
         return NSRect(
             x: notchInfo.centerX - w / 2,
             y: notchInfo.topY - h,

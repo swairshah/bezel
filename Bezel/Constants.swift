@@ -3,9 +3,14 @@ import AppKit
 enum Constants {
     // Bezel dimensions — expands both horizontally and vertically
     static let collapsedWidth: CGFloat = 300
-    static let collapsedHeight: CGFloat = 36
     static let expandedWidth: CGFloat = 360
     static let expandedHeight: CGFloat = 120
+    static let collapsedHeightWithNotch: CGFloat = 36
+    static let collapsedHeightWithoutNotch: CGFloat = 25
+    static let shoulderSizeWithNotch: CGFloat = 16
+    static let shoulderSizeWithoutNotch: CGFloat = 12
+    static let bottomRadiusWithNotch: CGFloat = 22
+    static let bottomRadiusWithoutNotch: CGFloat = 10
 
     // Animation
     static let openDuration: TimeInterval = 0.5     // initial open from notch
@@ -29,4 +34,16 @@ enum Constants {
     static let sectionColor = NSColor(white: 0.14, alpha: 1)
     static let chipColor    = NSColor(white: 0.22, alpha: 1)
     static let dimText      = NSColor(white: 0.45, alpha: 1)
+
+    static func collapsedHeight(hasNotch: Bool) -> CGFloat {
+        hasNotch ? collapsedHeightWithNotch : collapsedHeightWithoutNotch
+    }
+
+    static func shoulderSize(hasNotch: Bool) -> CGFloat {
+        hasNotch ? shoulderSizeWithNotch : shoulderSizeWithoutNotch
+    }
+
+    static func bottomRadiusLimit(hasNotch: Bool) -> CGFloat {
+        hasNotch ? bottomRadiusWithNotch : bottomRadiusWithoutNotch
+    }
 }

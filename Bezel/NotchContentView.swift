@@ -66,6 +66,7 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
     private var musicLabel: NSTextField!
     private var offChip: NSView!
     private var offLabel: NSTextField!
+    private var hasNotch = false
 
     // ── Init ───────────────────────────────────────────────────
 
@@ -216,7 +217,7 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         shapeMask.path = bezelPath(in: layer!.bounds, morph: shapeMorphProgress)
 
         let w = bounds.width
-        let barH: CGFloat = Constants.collapsedHeight
+        let barH = Constants.collapsedHeight(hasNotch: hasNotch)
         let pad: CGFloat = 26
         
         // Calculate offset to keep dot/timer in same absolute screen position
@@ -331,11 +332,17 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         let h = rect.height
         
         // Ear size (fixed for consistent look) and bottom corner radius
-        let earSize: CGFloat = 16
-        let bottomRadius: CGFloat = min(22, h / 2, w / 4)  // more rounded corners
+        let earSize = Constants.shoulderSize(hasNotch: hasNotch)
+        let maxBottomByHeight = max(0, h - earSize - 1)
+        let bottomRadius = min(
+            Constants.bottomRadiusLimit(hasNotch: hasNotch),
+            h / 2,
+            w / 4,
+            maxBottomByHeight
+        )
         
         // Safety: if too small, just return a rounded rect
-        guard w > earSize * 2 + 4, h > earSize + bottomRadius else {
+        guard w > earSize * 2 + 4, h > earSize + 1 else {
             return CGPath(roundedRect: rect, cornerWidth: min(h/2, 12), cornerHeight: min(h/2, 12), transform: nil)
         }
         
@@ -474,7 +481,7 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         picker.layer?.backgroundColor = Constants.sectionColor.cgColor
         picker.layer?.cornerRadius = 8
         
-        let btnSize: CGFloat = 36
+        let btnSize: CGFloat = 25
         let gap: CGFloat = 4
         let padding: CGFloat = 4
         let pickerW = CGFloat(durationOptions.count) * btnSize + CGFloat(durationOptions.count - 1) * gap + padding * 2
@@ -686,5 +693,11 @@ final class NotchContentView: NSView, NSTextFieldDelegate {
         let config = NSImage.SymbolConfiguration(pointSize: size, weight: weight)
         return NSImage(systemSymbolName: name, accessibilityDescription: nil)?
             .withSymbolConfiguration(config)
+    }
+
+    func applyDisplayProfile(hasNotch: Bool) {
+        guard self.hasNotch != hasNotch else { return }
+        self.hasNotch = hasNotch
+        needsLayout = true
     }
 }
